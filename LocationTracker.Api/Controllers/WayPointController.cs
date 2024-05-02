@@ -59,7 +59,7 @@ namespace LocationTracker.Api.Controllers
 		/// </summary>
 		/// <param name="stopsAfter">The starting date.</param>
 		/// <returns>A list of <see cref="WayPoints"/>.</returns>
-		[HttpGet("lastlocationall/{stopsAfter}")]
+		[HttpGet("locationsall/{stopsAfter}")]
 		public async Task<List<WayPoint>> GetRecentLocationsForAllUsersAsync(DateTime stopsAfter)
 		{
 			return await _dataService.GetRecentLocationsForAllUsersAsync(stopsAfter);
