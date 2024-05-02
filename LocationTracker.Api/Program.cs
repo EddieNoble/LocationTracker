@@ -1,4 +1,7 @@
 
+using LocationTracker.Api.Services;
+using LocationTracker.Api.Services.Interfaces;
+
 namespace LocationTracker.Api
 {
 	public class Program
@@ -8,7 +11,7 @@ namespace LocationTracker.Api
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-
+			builder.Services.AddSingleton<IDataService, DataService>();
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
@@ -25,8 +28,9 @@ namespace LocationTracker.Api
 
 			app.UseHttpsRedirection();
 
-			app.UseAuthorization();
+			app.UseRouting();
 
+			app.UseAuthorization();
 
 			app.MapControllers();
 
