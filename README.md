@@ -1,4 +1,4 @@
-Location tRACKER API
+Location Tracker API
 This project provides a simple .NET Web API for recording and retrieving location data. It allows clients to submit location information and retrieve stored data.
 
 Prerequisites
