@@ -48,6 +48,7 @@ namespace LocationTracker.Api.Controllers
 		/// </summary>
 		/// <param name="userId">The unique ID of the user.</param>
 		/// <returns>A <see cref="WayPoint"/> object.</returns>
+		[HttpGet("lastlocation/{userId}")]
 		public async Task<WayPoint> GetLastLocationForUserAsync(Guid userId)
 		{
 			return await _dataService.GetLastLocationForUserAsync(userId);
@@ -58,6 +59,7 @@ namespace LocationTracker.Api.Controllers
 		/// </summary>
 		/// <param name="stopsAfter">The starting date.</param>
 		/// <returns>A list of <see cref="WayPoints"/>.</returns>
+		[HttpGet("lastlocationall/{stopsAfter}")]
 		public async Task<List<WayPoint>> GetRecentLocationsForAllUsersAsync(DateTime stopsAfter)
 		{
 			return await _dataService.GetRecentLocationsForAllUsersAsync(stopsAfter);
