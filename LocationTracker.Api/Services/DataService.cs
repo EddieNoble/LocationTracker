@@ -46,10 +46,23 @@ namespace LocationTracker.Api.Services
 		}
 
 		// <inheritdoc />
-		public async Task<List<WayPoint>> GetAllLocationsForUserAsync(Guid userId)
+		public async Task<List<WayPoint>> GetAllLocationsForUserAsync(Guid userId, int page = 0, int pageSize = 0)
 		{
-			return await _context.WayPoints
-				.Where(wp => wp.UserId == userId).ToListAsync();
+            var usersWayPoints = 
+				_context.WayPoints.Where(wp => wp.UserId == userId).OrderBy(wp => wp.StopTime);
+
+			if (pageSize > 0) 
+			{
+				var skip = page * pageSize;
+
+				usersWayPoints = (IOrderedQueryable<WayPoint>)usersWayPoints.Skip(skip).Take(pageSize);
+
+			}
+
+			return await usersWayPoints.ToListAsync();
+
+    //        return await _context.WayPoints
+				//.Where(wp => wp.UserId == userId).ToListAsync();
 		}
 
 		// <inheritdoc />

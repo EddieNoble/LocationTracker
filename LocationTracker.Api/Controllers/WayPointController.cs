@@ -32,15 +32,17 @@ namespace LocationTracker.Api.Controllers
 			return Ok();
 		}
 
-		/// <summary>
-		/// Gets all WayPoints for the specified user.
-		/// </summary>
-		/// <param name="userId">The unique ID of the user.</param>
-		/// <returns>A list of <see cref="WayPoint"/> objects.</returns>
-		[HttpGet("{userId}")]
-		public async Task<List<WayPoint>> GetAllLocationsForUserAsync(Guid userId)
+        /// <summary>
+        /// Gets all WayPoints for the specified user.
+        /// </summary>
+        /// <param name="userId">The unique ID of the user.</param>
+        /// <param name="page">Optional - page of results to return.</param>
+        /// <param name="pageSize">Optional - page size. If set to 0 all records will be returned regardless of any Page value.</param>
+        /// <returns>A list of <see cref="WayPoint"/> objects.</returns>
+        [HttpGet("{userId}/{page?}/{pageSize?}")]
+		public async Task<List<WayPoint>> GetAllLocationsForUserAsync(Guid userId, int page = 0, int pageSize = 0)
 		{
-			return await _dataService.GetAllLocationsForUserAsync(userId);
+			return await _dataService.GetAllLocationsForUserAsync(userId, page, pageSize);
 		}
 
 		/// <summary>

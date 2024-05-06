@@ -75,6 +75,46 @@ namespace LocationTracker.Api.UnitTests
             await _connection.CloseAsync();
         }
 
+		[TestMethod]	
+		[DataRow(0, 2, 1)]
+        [DataRow(1, 2, 3)]
+        [DataRow(2, 3, 8)]
+        [DataRow(1, 3, 5)]
+        public async Task GetAllLocationsForUserAsyncReturnsRequestedPage(int page, int pageSize, int lastRecordIndex)
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var lat = SampleLat;
+            var lng = SampleLong;
+            var user = new User { Id = userId, Name = "User1" };
+			List<WayPoint> wayPoints = new List<WayPoint>();
+			var recordsToGenerate = pageSize * pageSize;
+
+            var context = CreateContext();
+            context.Users.Add(user);
+
+            for (var i = 0; i < recordsToGenerate; i++) 
+			{
+				var stopTime = DateTime.Now;
+				var wayPoint = new WayPoint { UserId = userId, Latitude = lat, Longitude = lng, StopTime = stopTime };
+				wayPoints.Add(wayPoint);
+				context.Add(wayPoint);
+            }
+
+            await context.SaveChangesAsync();
+
+            var sut = new DataService(context);
+
+            // Act
+            var result = await sut.GetAllLocationsForUserAsync(userId, page, pageSize);
+
+            // Assert
+            Assert.AreEqual(pageSize, result.Count);
+			Assert.AreEqual(lastRecordIndex, wayPoints.IndexOf(wayPoints.Single(wp => wp.Id == result.Last().Id)));
+            await context.DisposeAsync();
+            await _connection.CloseAsync();
+        }
+
         [TestMethod]
 		public async Task GetLastLocationForUserAsyncRetreivesTheLastRecord()
 		{
