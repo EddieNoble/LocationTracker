@@ -1,6 +1,7 @@
 ﻿using LocationTracker.Api.Services.Interfaces;
 using LocationTracker.Context;
 using LocationTracker.Domain;
+using LocationTracker.Domain.EventArguments;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,18 @@ namespace LocationTracker.Api.Services
 	// <inheritdoc />
 	public class DataService : IDataService
 	{
+        /// <summary>
+        /// Represents the method that will handle an event when a <see cref="WayPoint"/> is added. />
+        /// </summary>
+        /// <param name="sender">The event source.</param>
+        /// <param name="e">A <see cref="WayPointAddedEventArgs" containing the new WayPoint. /></param>
+        public delegate void WayPointAddedEventHandler(object sender, WayPointAddedEventArgs e);
+
+		/// <summary>
+		/// Raised when a new WayPoint is added to the data store.
+		/// </summary>
+		public event WayPointAddedEventHandler WayPointAdded;	
+
 		private readonly LocationTrackerContext _context;
 
         public DataService(LocationTrackerContext context)
@@ -29,6 +42,7 @@ namespace LocationTracker.Api.Services
 		{
 			await _context.WayPoints.AddAsync(waypoint);
 			await _context.SaveChangesAsync();
+			OnWayPointAdded(waypoint);
 		}
 
 		// <inheritdoc />
@@ -54,6 +68,13 @@ namespace LocationTracker.Api.Services
 		{
 			return await _context.WayPoints
 				.Where(wp => wp.StopTime > stopsAfter).ToListAsync();
+		}
+
+		private void OnWayPointAdded(WayPoint newWayPoint) 
+		{
+			var handler = WayPointAdded;
+			var args = new WayPointAddedEventArgs { NewWayPoint = newWayPoint };
+			handler?.Invoke(this, args);
 		}
 
 		private LocationTrackerContext CreateContext()
