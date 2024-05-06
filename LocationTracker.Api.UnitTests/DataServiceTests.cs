@@ -1,4 +1,5 @@
-﻿using LocationTracker.Api.Services;
+﻿using LocationTracker.Api.Models;
+using LocationTracker.Api.Services;
 using LocationTracker.Context;
 using LocationTracker.Domain;
 using Microsoft.Data.Sqlite;
@@ -247,6 +248,45 @@ namespace LocationTracker.Api.UnitTests
             Assert.AreEqual(SampleLat, newWayPoint.Latitude);
             Assert.AreEqual(SampleLong, newWayPoint.Longitude);
 			Assert.AreEqual(stopTime, newWayPoint?.StopTime);
+            await context.DisposeAsync();
+            await _connection.CloseAsync();
+        }
+
+        [TestMethod]
+        public async Task GetRecentLocationsForAllUsersInBouundsAsyncRetreivesRecordsAterTheSpecifiedDateTimeAndInBounds()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var stopTime = DateTime.Now;
+            var queryTime = stopTime.AddMinutes(-1);
+			var queryBoundsSW = new GeoCoordinate { Latitude = 53.118755, Longitude = -1.448822 };
+            var queryBoundsNE = new GeoCoordinate { Latitude = 55.118755, Longitude = 2.448822 };
+            var inBoundsCoords1 = new GeoCoordinate { Latitude = 54.118755, Longitude = 2.148822 };
+            var inBoundsCoords2 = new GeoCoordinate { Latitude = 54.918755, Longitude = -1.148822 };
+            var outBoundsCoords1 = new GeoCoordinate { Latitude = 52.918755, Longitude = 1.948822 };
+            var outBoundsCoords2 = new GeoCoordinate { Latitude = 54.918755, Longitude = -2.948822 };
+
+            var user = new User { Id = userId, Name = "User1" };
+            var waypoint1 = new WayPoint { UserId = userId, Latitude = inBoundsCoords1.Latitude, Longitude = inBoundsCoords1.Longitude, StopTime = stopTime };
+            var waypoint2 = new WayPoint { UserId = userId, Latitude = inBoundsCoords2.Latitude, Longitude = inBoundsCoords2.Longitude, StopTime = stopTime };
+            var waypoint3 = new WayPoint { UserId = userId, Latitude = outBoundsCoords1.Latitude, Longitude = outBoundsCoords1.Longitude, StopTime = stopTime };
+            var waypoint4 = new WayPoint { UserId = userId, Latitude = outBoundsCoords2.Latitude, Longitude = outBoundsCoords2.Longitude, StopTime = stopTime };
+
+            var context = CreateContext();
+            context.Users.Add(user);
+            context.WayPoints.Add(waypoint1);
+            context.WayPoints.Add(waypoint2);
+			context.WayPoints.Add(waypoint3);
+			context.WayPoints.Add(waypoint4);
+			await context.SaveChangesAsync();
+
+			var sut = new DataService(context);
+
+			// Act
+			var result = await sut.GetRecentLocationsForAllUsersInBoundsAsync(queryTime, queryBoundsSW, queryBoundsNE); 
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
             await context.DisposeAsync();
             await _connection.CloseAsync();
         }

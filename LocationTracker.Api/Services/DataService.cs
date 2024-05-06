@@ -1,9 +1,12 @@
-﻿using LocationTracker.Api.Services.Interfaces;
+﻿using LocationTracker.Api.Models;
+using LocationTracker.Api.Services.Interfaces;
 using LocationTracker.Context;
 using LocationTracker.Domain;
 using LocationTracker.Domain.EventArguments;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
+using System.Text;
 
 namespace LocationTracker.Api.Services
 {
@@ -65,9 +68,6 @@ namespace LocationTracker.Api.Services
 			}
 
 			return await usersWayPoints.ToListAsync();
-
-    //        return await _context.WayPoints
-				//.Where(wp => wp.UserId == userId).ToListAsync();
 		}
 
 		// <inheritdoc />
@@ -88,8 +88,35 @@ namespace LocationTracker.Api.Services
 				.Where(wp => wp.StopTime > stopsAfter).ToListAsync();
 		}
 
-		private void OnWayPointAdded(WayPoint newWayPoint) 
-		{
+        // <inheritdoc />
+        public async Task<List<WayPoint>> GetRecentLocationsForAllUsersInBoundsAsync(DateTime stopsAfter, GeoCoordinate southWest, GeoCoordinate northEast)
+        {
+			var pointsInTime = await _context.WayPoints.Where(wp => wp.StopTime > stopsAfter).ToListAsync();
+
+            return 
+				pointsInTime.Where(p => 
+				IsWithinBounds( 
+					new GeoCoordinate { Latitude = p.Latitude, Longitude = p.Longitude}, 
+					southWest, 
+					northEast)).ToList();
+        }
+
+		private static bool IsWithinBounds(GeoCoordinate pointToCheck, GeoCoordinate southWestBound, GeoCoordinate northEastBound)
+        {
+
+			bool isLatitudeInRange =
+				pointToCheck.Latitude >= southWestBound.Latitude
+				&& pointToCheck.Latitude <= northEastBound.Latitude;
+
+            bool isLongitudeInRange =
+				pointToCheck.Longitude >= southWestBound.Longitude
+				&& pointToCheck.Longitude <= northEastBound.Longitude;
+
+            return isLatitudeInRange && isLongitudeInRange;		
+		}
+
+        private void OnWayPointAdded(WayPoint newWayPoint)
+        {
 			var handler = WayPointAdded;
 			var args = new WayPointAddedEventArgs { NewWayPoint = newWayPoint };
 			handler?.Invoke(this, args);
@@ -120,5 +147,5 @@ namespace LocationTracker.Api.Services
 
 			return context;
 		}
-	}
+    }
 }

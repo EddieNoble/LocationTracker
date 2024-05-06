@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Domain\LocationTracker.Domain.csproj" />
     <ProjectReference Include="..\LocationTracker.Context\LocationTracker.Context.csproj" />
   </ItemGroup>

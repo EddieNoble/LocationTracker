@@ -1,4 +1,5 @@
-﻿using LocationTracker.Api.Services.Interfaces;
+﻿using LocationTracker.Api.Models;
+using LocationTracker.Api.Services.Interfaces;
 using LocationTracker.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,5 +78,24 @@ namespace LocationTracker.Api.Controllers
 		{
 			return await _dataService.GetRecentLocationsForAllUsersAsync(stopsAfter);
 		}
-	}
+
+        /// <summary>
+        /// Gets a list of Waypoints for all users after the specified date wiothin bounds.
+        /// </summary>
+        /// <param name="stopsAfter">The starting date.</param>
+        /// <param name="southWestLat">The south western boundary latitude.</param>
+        /// <param name="southWestLong">The south western boundary longitude.</param>
+        /// <param name="northEastLat">The north eastern boundary latitude.</param>
+		/// <param name="northEastLing">The north eastern boundary longitude.</param>
+        /// <returns>A list of <see cref="WayPoints"/>.</returns>
+        [HttpGet("locationsallinbounds/{stopsAfter}/{southWestLat}/{southWestLong}/{northEastLat}/{northEastLong}")]
+		public async Task<List<WayPoint>> GetRecentLocationsForAllUsersInBoundsAsync
+			(DateTime stopsAfter, double southWestLat, double southWestLong, double northEastLat, double northEastLong)
+		{
+			return await _dataService.GetRecentLocationsForAllUsersInBoundsAsync(
+				stopsAfter,
+				new GeoCoordinate { Latitude = southWestLat, Longitude = southWestLong },
+				new GeoCoordinate { Latitude = northEastLat, Longitude = northEastLong});
+        }
+    }
 }

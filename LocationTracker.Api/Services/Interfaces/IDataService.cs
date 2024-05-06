@@ -1,4 +1,5 @@
-﻿using LocationTracker.Domain;
+﻿using LocationTracker.Api.Models;
+using LocationTracker.Domain;
 
 namespace LocationTracker.Api.Services.Interfaces
 {
@@ -36,5 +37,15 @@ namespace LocationTracker.Api.Services.Interfaces
 		/// <param name="stopsAfter">The earliest date to return.</param>
 		/// <returns>A list of <see cref="WayPoint"/> objects.</returns>
 		Task<List<WayPoint>> GetRecentLocationsForAllUsersAsync(DateTime stopsAfter);
-	}
+
+        /// <summary>
+        /// Gets locations visited by all users sice the specified date and time and within a specified boundary.
+        /// </summary>
+        /// <param name="stopsAfter">The earliest date to return.</param>
+		/// <param name="northEast">The North Eastern boundary of the query.</param>
+		/// <param name="southWest">The South estern boundary of the query.</param>
+        /// <returns>A list of <see cref="WayPoint"/> objects.</returns>
+        Task<List<WayPoint>> GetRecentLocationsForAllUsersInBoundsAsync(DateTime stopsAfter, GeoCoordinate southWest, GeoCoordinate northEast);
+    }
+
 }
