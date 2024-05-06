@@ -28,8 +28,19 @@ namespace LocationTracker.Api.Controllers
 		[HttpPost("add")]
 		public async Task<IActionResult> AddLocationAsync([FromBody] WayPoint waypoint)
 		{
-			await _dataService.AddLocationAsync(waypoint);
-			return Ok();
+			try
+			{
+				await _dataService.AddLocationAsync(waypoint);
+				return Ok();
+			}
+			catch (KeyNotFoundException knfException)
+			{
+				return BadRequest(knfException);
+			}
+			catch (Exception exception) 
+			{
+				return StatusCode(500, exception.Message);
+			}
 		}
 
         /// <summary>

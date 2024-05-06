@@ -40,6 +40,11 @@ namespace LocationTracker.Api.Services
 		// <inheritdoc />
 		public async Task AddLocationAsync(WayPoint waypoint)
 		{
+			if (!_context.Users.Any(u => u.Id == waypoint.UserId)) 
+			{
+				throw new KeyNotFoundException($"No user found with ID {waypoint.UserId}");
+			}
+
 			await _context.WayPoints.AddAsync(waypoint);
 			await _context.SaveChangesAsync();
 			OnWayPointAdded(waypoint);

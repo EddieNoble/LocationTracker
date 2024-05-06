@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LocationTracker.Domain
 {
@@ -10,6 +11,7 @@ namespace LocationTracker.Domain
 		/// <summary>
 		/// The unique ID of the Waypoint.
 		/// </summary>
+		[Key]
 		public Guid Id { get; set; }
 
 		/// <summary>

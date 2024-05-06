@@ -43,7 +43,39 @@ namespace LocationTracker.Api.UnitTests
 			await _connection.CloseAsync();
 		}
 
-		[TestMethod]
+        [TestMethod]
+		[ExpectedException(typeof(KeyNotFoundException))]
+        public async Task AddLocationAsyncWhenPassedWaypointForNonExistentUserThrowsException()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var stopTime = DateTime.Now;
+            var lat = SampleLat;
+            var lng = SampleLong;
+            var context = CreateContext();
+
+            var location = new WayPoint { UserId = userId, Latitude = lat, Longitude = lng, StopTime = stopTime };
+
+            var sut = new DataService(context);
+
+			// Act
+			try
+			{
+				await sut.AddLocationAsync(location);
+			}
+			catch (Exception exception)
+			{
+				throw;
+			}
+			finally
+			{
+				await context.DisposeAsync();
+				await _connection.CloseAsync();
+			}
+        }
+
+
+        [TestMethod]
 		public async Task GetAllLocationsForUserAsyncReturnsOnlyRecordsForTheSpecifiedUser()
 		{
 			// Arrange
@@ -193,7 +225,8 @@ namespace LocationTracker.Api.UnitTests
 			var context = CreateContext();
 			var user = new User { Id = userId, Name = "User1" };
 
-			context.Users.Add(user);	
+			context.Users.Add(user);
+			await context.SaveChangesAsync();
 
             var waypoint = new WayPoint { UserId = userId, Latitude = lat, Longitude = lng, StopTime = stopTime };
 
